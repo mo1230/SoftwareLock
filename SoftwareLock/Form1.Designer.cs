@@ -52,6 +52,7 @@
             this.btnUnlock.TabIndex = 0;
             this.btnUnlock.Text = "解锁";
             this.btnUnlock.UseVisualStyleBackColor = true;
+            this.btnUnlock.Click += new System.EventHandler(this.btnUnlock_Click);
             // 
             // label1
             // 

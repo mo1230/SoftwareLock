@@ -17,13 +17,14 @@ namespace SoftwareLock
 
         private readonly string sSecretKey = "?\a??64(?";
         private Form2 form2 = new Form2();
+        private int flag = 0;   // 0为解密 1为加密
         public Form1()
         {
             InitializeComponent();
             // 定时器 每隔一秒执行
             Timer timer = new Timer();
             timer.Interval = 1000;
-            timer.Tick += new EventHandler(listLockAdd);
+            timer.Tick += new EventHandler(listLockAddAndDel);
             timer.Enabled = true;
             timer.Start();
 
@@ -33,29 +34,63 @@ namespace SoftwareLock
 
         private void btnLock_Click(object sender, EventArgs e)
         {
-            
-            
+
+            this.flag = 1;
             form2.ShowDialog();
         }
 
-        private void listLockAdd(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listLockAddAndDel(object sender, EventArgs e)
         {
-            if(Form2.FileName != null)
+            //try {
+                if (Form2.FileName != null)
+                {
+                    if (flag == 1)
+                    {
+                        this.listLock.Items.Add(Form2.FileName);
+                        this.EncryptFile(Form2.FileName, Form2.FileName + ".lock");
+                        File.Delete(Form2.FileName);
+                        Form2.FileName = null;
+                    }
+                    else
+                    {
+                        this.listLock.Items.Remove(Form2.FileName.Substring(0, Form2.FileName.Length - 5));
+                        this.DecryptFile(Form2.FileName, Form2.FileName.Substring(0, Form2.FileName.Length - 5));
+                        File.Delete(Form2.FileName);
+                        Form2.FileName = null;    
+                    }
+
+
+                }
+                if (Form2.FolderName != null)
+                {
+                    if (flag == 1)
+                    {
+                        this.listLock.Items.Add(Form2.FolderName);
+
+                        Form2.FolderName = null;
+                    }
+                    else
+                    {
+                        this.listLock.Items.Remove(Form2.FolderName);
+                        this.DecryptFile(Form2.FolderName, Form2.FolderName.Substring(0, Form2.FolderName.Length - 5));
+                        Form2.FolderName = null;
+                    }
+
+                }
+            /*}catch(Exception ex)
             {
-                this.listLock.Items.Add(Form2.FileName);
-                this.EncryptFile(Form2.FileName, Form2.FileName + ".txt");
-                Form2.FileName = null;
-                
-            }
-            if(Form2.FolderName != null)
-            {
-                this.listLock.Items.Add(Form2.FolderName);
-                
-                Form2.FolderName = null;
-            }
+                MessageBox.Show(ex.Message);
+            }*/
+            
             
         }
 
+        
         // 加密
         /// <summary>
         /// 加密文件
@@ -83,6 +118,36 @@ namespace SoftwareLock
             cryptostream.Close();
             fsInput.Close();
             fsEncrypted.Close();
+        }
+
+
+        /// <summary>
+        /// 解密文件
+        /// </summary>
+        /// <param name="sInputFilename">待解密的文件的完整路径</param>
+        /// <param name="sOutputFilename">解密后的文件的完整路径</param>
+        private bool DecryptFile(string sInputFilename, string sOutputFilename)
+        {
+            DESCryptoServiceProvider DES = new DESCryptoServiceProvider();
+            DES.Key = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
+            DES.IV = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
+
+            FileStream fsread = new FileStream(sInputFilename, FileMode.Open, FileAccess.Read);
+            ICryptoTransform desdecrypt = DES.CreateDecryptor();
+            CryptoStream cryptostreamDecr = new CryptoStream(fsread, desdecrypt, CryptoStreamMode.Read);
+            StreamWriter fsDecrypted = new StreamWriter(sOutputFilename);
+            fsDecrypted.Write(new StreamReader(cryptostreamDecr).ReadToEnd());
+            fsDecrypted.Flush();
+            fsDecrypted.Close();
+            fsread.Close();
+            return true;
+        }
+
+
+        private void btnUnlock_Click(object sender, EventArgs e)
+        {
+            this.flag = 0;
+            form2.ShowDialog();
         }
     }
 }

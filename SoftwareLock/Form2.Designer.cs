@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
             this.btnFile = new System.Windows.Forms.Button();
             this.btnFolder = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -47,7 +48,7 @@
             this.btnFolder.Location = new System.Drawing.Point(25, 83);
             this.btnFolder.Name = "btnFolder";
             this.btnFolder.Size = new System.Drawing.Size(289, 39);
-            this.btnFolder.TabIndex = 0;
+            this.btnFolder.TabIndex = 1;
             this.btnFolder.Text = "选择文件夹";
             this.btnFolder.UseVisualStyleBackColor = true;
             this.btnFolder.Click += new System.EventHandler(this.btnFolder_Click);
@@ -59,8 +60,10 @@
             this.ClientSize = new System.Drawing.Size(344, 158);
             this.Controls.Add(this.btnFolder);
             this.Controls.Add(this.btnFile);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form2";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "选择";
             this.ResumeLayout(false);
 

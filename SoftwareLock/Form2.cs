@@ -15,6 +15,22 @@ namespace SoftwareLock
     {
         public static string FileName { get; set; }
         public static string FolderName { get; set; }
+        private bool folderEnaled;
+        public bool FolderEnabled
+        {
+            set
+            {
+                this.folderEnaled = value;
+                if(this.folderEnaled == true)
+                {
+                    this.btnFolder.Enabled = true;
+                }
+                else
+                {
+                    this.btnFolder.Enabled = false;
+                }
+            }
+        }
         public Form2()
         {
             InitializeComponent();

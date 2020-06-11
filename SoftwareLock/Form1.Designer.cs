@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnLock = new System.Windows.Forms.Button();
             this.btnUnlock = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,7 +50,7 @@
             this.btnUnlock.Location = new System.Drawing.Point(35, 92);
             this.btnUnlock.Name = "btnUnlock";
             this.btnUnlock.Size = new System.Drawing.Size(298, 42);
-            this.btnUnlock.TabIndex = 0;
+            this.btnUnlock.TabIndex = 1;
             this.btnUnlock.Text = "解锁";
             this.btnUnlock.UseVisualStyleBackColor = true;
             this.btnUnlock.Click += new System.EventHandler(this.btnUnlock_Click);
@@ -62,7 +63,7 @@
             this.label1.Location = new System.Drawing.Point(33, 183);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(230, 21);
-            this.label1.TabIndex = 1;
+            this.label1.TabIndex = 2;
             this.label1.Text = "已上锁文件或文件夹：";
             // 
             // listLock
@@ -72,7 +73,7 @@
             this.listLock.Location = new System.Drawing.Point(37, 233);
             this.listLock.Name = "listLock";
             this.listLock.Size = new System.Drawing.Size(296, 88);
-            this.listLock.TabIndex = 2;
+            this.listLock.TabIndex = 3;
             // 
             // Form1
             // 
@@ -83,9 +84,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnUnlock);
             this.Controls.Add(this.btnLock);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.ResumeLayout(false);
             this.PerformLayout();
 

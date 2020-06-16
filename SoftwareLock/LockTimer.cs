@@ -9,5 +9,6 @@ namespace SoftwareLock
     class LockTimer
     {
         //ToDo
+
     }
 }

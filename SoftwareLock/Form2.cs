@@ -31,6 +31,22 @@ namespace SoftwareLock
                 }
             }
         }
+        private bool fileEnabled;
+        public bool FileEnabled
+        {
+            set
+            {
+                this.fileEnabled = value;
+                if(this.fileEnabled == true)
+                {
+                    this.btnFile.Enabled = true;
+                }
+                else
+                {
+                    this.btnFile.Enabled = false;
+                }
+            }
+        }
         public Form2()
         {
             InitializeComponent();
@@ -43,6 +59,7 @@ namespace SoftwareLock
             ofd.ValidateNames = true;
             ofd.CheckPathExists = true;
             ofd.CheckFileExists = true;
+            
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 //string strFileName = ofd.FileName;

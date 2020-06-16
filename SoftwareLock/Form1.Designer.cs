@@ -33,16 +33,18 @@
             this.btnUnlock = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.listLock = new System.Windows.Forms.ListBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnLock
             // 
+            this.btnLock.BackColor = System.Drawing.Color.Transparent;
             this.btnLock.Location = new System.Drawing.Point(35, 12);
             this.btnLock.Name = "btnLock";
             this.btnLock.Size = new System.Drawing.Size(298, 42);
             this.btnLock.TabIndex = 0;
             this.btnLock.Text = "上锁";
-            this.btnLock.UseVisualStyleBackColor = true;
+            this.btnLock.UseVisualStyleBackColor = false;
             this.btnLock.Click += new System.EventHandler(this.btnLock_Click);
             // 
             // btnUnlock
@@ -75,15 +77,29 @@
             this.listLock.Size = new System.Drawing.Size(296, 88);
             this.listLock.TabIndex = 3;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("楷体", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.ForeColor = System.Drawing.Color.Red;
+            this.label2.Location = new System.Drawing.Point(33, 342);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(289, 60);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "请注意：\r\n上锁之后的文件或文件夹只能在\r\n19:00后进行解锁";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(368, 450);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.listLock);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnUnlock);
             this.Controls.Add(this.btnLock);
+            this.ForeColor = System.Drawing.Color.Black;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
@@ -99,6 +115,7 @@
         private System.Windows.Forms.Button btnUnlock;
         private System.Windows.Forms.Label label1;
         public System.Windows.Forms.ListBox listLock;
+        private System.Windows.Forms.Label label2;
     }
 }
 

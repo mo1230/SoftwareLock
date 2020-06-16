@@ -18,12 +18,20 @@ namespace SoftwareLock
     {
 
         private readonly string sSecretKey = "?\a??64(?";
+        private const string pwd = "(>SR4B]Wqf";
+        private const string settingFilePath = "zipfiles.txt";
         private Form2 form2 = new Form2();
         private int flag = 0;   // 0为解密 1为加密
         private string zipFile = "";
+        private List<string> settingFileContent = new List<string>();
         public Form1()
         {
             InitializeComponent();
+
+            // zipfiles.txt文件
+            this.SettingFile();
+            this.listLock.Items.AddRange(this.settingFileContent.ToArray());
+
             // 定时器 每隔一秒执行
             Timer timer = new Timer();
             timer.Interval = 1000;
@@ -31,132 +39,106 @@ namespace SoftwareLock
             timer.Enabled = true;
             timer.Start();
 
+            // 判断时间
+            MessageBox.Show("当前时间为：" + DateTime.Now.ToLongTimeString() + "\n19:00前无法解锁！", "提醒", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DateTime unLockTime = Convert.ToDateTime("19:00");
+            int i = DateTime.Now.CompareTo(unLockTime);
+            if(i <= 0)
+            {
+                this.btnUnlock.Enabled = false;
+            }
+            else
+            {
+                this.btnUnlock.Enabled = true;
+            }   
         }
 
-   
-
+ 
         private void btnLock_Click(object sender, EventArgs e)
         {
 
             this.flag = 1;
             form2.FolderEnabled = true;
+            form2.FileEnabled = false;
             form2.ShowDialog();
         }
 
         /// <summary>
-        /// 
+        /// 列表内容的添加与删除
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void listLockAddAndDel(object sender, EventArgs e)
+        private void listLockAddAndDel(object sender, EventArgs e)
         {
             
-                if (Form2.FileName != null)
+
+            if (Form2.FileName != null)
                 {
                     
                     if (flag == 1)
                     {
-                        this.listLock.Items.Add(Path.GetDirectoryName(Form2.FileName) + "\\" + Path.GetFileNameWithoutExtension(Form2.FileName) + ".zip");
-                        await Task.Run(() =>
-                        {
-                            
-                            this.CreateZip(Form2.FileName, "123456");
-                          
-                        });
-                        
-                        File.Delete(Form2.FileName);
-                        
+                        string fileName = Form2.FileName;
                         Form2.FileName = null;
+                        string item = Path.GetDirectoryName(fileName) + "\\" + Path.GetFileNameWithoutExtension(fileName) + ".zip";
+                        this.listLock.Items.Add(item);
+                        List<string> fileItems = new List<string>();
+                        fileItems.Add(item);
+                        // 路径写入到zipfiles.txt中
+                        File.AppendAllLines(settingFilePath, fileItems);
+                        
+                            
+                        this.CreateZip(fileName, pwd);
+                          
+                       
+                        
+                        File.Delete(fileName);
+                        
+                        
                     }
                     else
                     {
-                        this.listLock.Items.Remove(Form2.FileName);
-                        await Task.Run(()=>
+                        string fileName = Form2.FileName;
+                        Form2.FileName = null;
+                        this.listLock.Items.Remove(fileName);
+                        int index = this.settingFileContent.IndexOf(fileName);
+                        if(index >= 0)
                         {
+                        this.settingFileContent.RemoveAt(index);
+                        }
+                        
+                        File.WriteAllLines(settingFilePath, this.settingFileContent.ToArray<string>());
+                        
+                        this.UnZipFile(fileName, pwd);
+
+                        
+                        File.Delete(fileName);
                             
-                            this.UnZipFile(Form2.FileName, "123456");
-                        });
-                        
-                        File.Delete(Form2.FileName);
-                        Form2.FileName = null;    
                     }
-
-
                 }
-                if (Form2.FolderName != null)
+            if (Form2.FolderName != null)
                 {
-                    this.listLock.Items.Add(Form2.FolderName + ".zip");
-                    await Task.Run(() =>
-                    {
-
-                        FastZip fastZip = new FastZip();
-                        fastZip.Password = md5.encrypt("123456");
-                        fastZip.CreateZip(Form2.FolderName + ".zip", Form2.FolderName, true, "");
-                        
-
-                    });
+                    string folderName = Form2.FolderName;
                     Form2.FolderName = null;
+                    string item = folderName + ".zip";
+                    this.listLock.Items.Add(item);
+                    List<string> fileitems = new List<string>();
+                    fileitems.Add(item);
+                    File.AppendAllLines(settingFilePath, fileitems);
+
+                    FastZip fastZip = new FastZip();
+                    fastZip.Password = md5.encrypt(pwd);
+                    fastZip.CreateZip(item, folderName, true, ""); 
                 }   
         }
 
+
        
-        // 加密
-        /// <summary>
-        /// 加密文件
-        /// </summary>
-        /// <param name="sInputFilename">待加密的文件的完整路径</param>
-        /// <param name="sOutputFilename">加密后的文件的完整路径</param>
-        private void EncryptFile(string sInputFilename, string sOutputFilename)
-        {
-            FileStream fsInput = new FileStream(sInputFilename, FileMode.Open, FileAccess.Read);
-
-            FileStream fsEncrypted = new FileStream(sOutputFilename, FileMode.Create, FileAccess.Write);
-            DESCryptoServiceProvider DES = new DESCryptoServiceProvider();
-            DES.Key = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
-            DES.IV = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
-            ICryptoTransform desencrypt = DES.CreateEncryptor();
-            CryptoStream cryptostream = new CryptoStream(fsEncrypted, desencrypt, CryptoStreamMode.Write);
-
-            byte[] bytearrayinput = new byte[fsInput.Length];
-            fsInput.Read(bytearrayinput, 0, bytearrayinput.Length);
-            cryptostream.Write(bytearrayinput, 0, bytearrayinput.Length);
-
-            cryptostream.Flush();
-            fsInput.Flush();
-            fsEncrypted.Flush();
-            cryptostream.Close();
-            fsInput.Close();
-            fsEncrypted.Close();
-        }
-
-
-        /// <summary>
-        /// 解密文件
-        /// </summary>
-        /// <param name="sInputFilename">待解密的文件的完整路径</param>
-        /// <param name="sOutputFilename">解密后的文件的完整路径</param>
-        private bool DecryptFile(string sInputFilename, string sOutputFilename)
-        {
-            DESCryptoServiceProvider DES = new DESCryptoServiceProvider();
-            DES.Key = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
-            DES.IV = ASCIIEncoding.ASCII.GetBytes(sSecretKey);
-
-            FileStream fsread = new FileStream(sInputFilename, FileMode.Open, FileAccess.Read);
-            ICryptoTransform desdecrypt = DES.CreateDecryptor();
-            CryptoStream cryptostreamDecr = new CryptoStream(fsread, desdecrypt, CryptoStreamMode.Read);
-            StreamWriter fsDecrypted = new StreamWriter(sOutputFilename);
-            fsDecrypted.Write(new StreamReader(cryptostreamDecr).ReadToEnd());
-            fsDecrypted.Flush();
-            fsDecrypted.Close();
-            fsread.Close();
-            return true;
-        }
-
 
         private void btnUnlock_Click(object sender, EventArgs e)
         {
             this.flag = 0;
             form2.FolderEnabled = false;
+            form2.FileEnabled = true;
             form2.ShowDialog();
             
         }
@@ -231,7 +213,7 @@ namespace SoftwareLock
                 Console.WriteLine("压缩包大小:" + entry.Size);
 
                 //解压出被压缩的文件
-                FileStream fs = new FileStream(Path.GetDirectoryName(pathName) + "\\" + Path.GetFileNameWithoutExtension(pathName) + "\\" + entry.Name, FileMode.Create);
+                FileStream fs = new FileStream(Path.GetDirectoryName(pathName) + "\\" /*+ Path.GetFileNameWithoutExtension(pathName) + "\\"*/ + entry.Name, FileMode.Create);
 
                 //获取从压缩包中读取数据的流
                 Stream input = zf.GetInputStream(entry);
@@ -250,9 +232,19 @@ namespace SoftwareLock
             zf.Close();
         }
 
-
-
+        private void SettingFile()
+        {
+            
+            bool exist = File.Exists(settingFilePath);
+            if (!exist)
+            {
+                FileStream file = File.Create(settingFilePath);
+                file.Close();
+            }
+            this.settingFileContent = (File.ReadAllLines(settingFilePath)).ToList<string>();
+            
         }
+    }
 
     class md5
     {
